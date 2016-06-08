@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  TimerViewController.swift
 //  Random Reward
 //
 //  Created by Ravi Tadinada on 6/6/16.
@@ -8,23 +8,23 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class TimerViewController: UIViewController {
     
     // MARK: Properties
-    var timerValue = NSTimeInterval() // number of seconds on timer when timer started
-    var startTime : NSTimeInterval? // time when timer started
+    var stopwatchValue = NSTimeInterval() // number of seconds on timer when stopwatch started
+    var startTime : NSTimeInterval? // time when stopwatch started
     var timer : NSTimer?
 
     // MARK: Outlets
     @IBOutlet weak var timeLabel: UILabel!
-    @IBOutlet weak var startStopButton: UIButton!
+    @IBOutlet weak var pauseResumeButton: UIButton!
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         displayTime(0)
-        setButtonStart()
+        buttonPressed(pauseResumeButton)
     }
     
     
@@ -32,35 +32,31 @@ class ViewController: UIViewController {
     
     @IBAction func buttonPressed(sender: UIButton) {
         if let timerObj = timer {
-            timerValue = getUpdatedTime()
+            // stopwatch is running
+            stopwatchValue = getUpdatedTime()
             timerObj.invalidate()
             timer = nil
-            setButtonStart()
+            setButtonResume()
         }
         else {
+            // stopwatch is paused
             startTime = NSDate.timeIntervalSinceReferenceDate()
             timer = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: #selector(updateTime), userInfo: nil, repeats: true)
-            setButtonStop()
+            setButtonPause()
         }
         
     }
     
-    func setButtonStart() {
-        let buttonColor = UIColor(red: 72/255, green: 164/255, blue: 70/255, alpha: 1)
-        let textColor = UIColor(red: 36/255, green: 82/255, blue: 35/255, alpha: 1)
-        
-        startStopButton.backgroundColor = buttonColor
-        startStopButton.setTitleColor(textColor, forState: .Normal)
-        startStopButton.setTitle("Start", forState: .Normal)
+    @IBAction func stopButtonPressed(sender: UIButton) {
+        dismissViewControllerAnimated(true, completion: nil)
     }
     
-    func setButtonStop() {
-        let buttonColor = UIColor(red: 170/255, green: 0, blue: 0, alpha: 1)
-        let textColor = UIColor(red: 90/255, green: 0, blue: 0, alpha: 1)
-        
-        startStopButton.backgroundColor = buttonColor
-        startStopButton.setTitleColor(textColor, forState: .Normal)
-        startStopButton.setTitle("Stop", forState: .Normal)
+    func setButtonResume() {
+        pauseResumeButton.setTitle("Resume", forState: .Normal)
+    }
+    
+    func setButtonPause() {
+        pauseResumeButton.setTitle("Pause", forState: .Normal)
     }
     
     func updateTime() {
@@ -71,7 +67,7 @@ class ViewController: UIViewController {
         let currentTime = NSDate.timeIntervalSinceReferenceDate()
         let elapsedTime = currentTime - startTime!
         
-        return elapsedTime + timerValue
+        return elapsedTime + stopwatchValue
     }
     
     func displayTime(time : NSTimeInterval) {
